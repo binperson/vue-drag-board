@@ -82,12 +82,6 @@ export default {
         crossvent[op](el, type, fn)
       }
     },
-    isContainer (el) {
-      return el.classList.contains('drag-inner-list')
-    },
-    isList (el) {
-      return el.classList.contains('drag-inner-list')
-    },
     getBlocks (status) {
       return this.localBlocks.filter(block => block.status === status)
     },
@@ -123,11 +117,11 @@ export default {
       if (this.dragging && this.mirror) {
         return
       }
-      if (this.isContainer(item)) {
+      if (window.o.isContainer(item)) {
         return // don't drag container itself
       }
       var handle = item
-      while (this.getParent(item) && this.isList(this.getParent(item)) === false) {
+      while (this.getParent(item) && window.o.isList(this.getParent(item)) === false) {
         if (this.invalid(item, handle)) { // 无效的
           return
         }
@@ -197,9 +191,9 @@ export default {
       this.mirror.style.height = this.getRectHeight(rect) + 'px'
       classes.rm(this.mirror, 'gu-transit')
       classes.add(this.mirror, 'gu-mirror')
-      this.o.mirrorContainer.appendChild(this.mirror)
+      window.o.mirrorContainer.appendChild(this.mirror)
       this.touchy(this.documentElement, 'add', 'mousemove', this.drag)
-      classes.add(this.o.mirrorContainer, 'gu-unselectable')
+      classes.add(window.o.mirrorContainer, 'gu-unselectable')
     },
     start (context) {
       if (this.isCopy(context.item, context.source)) {
@@ -224,41 +218,38 @@ export default {
       this.mirror.style.left = x + 'px'
       this.mirror.style.top = y + 'px'
 
-      // var item = _copy || _item
-      // var elementBehindCursor = getElementBehindPoint(_mirror, clientX, clientY) // 鼠标下的元素
-      // console.log('elementBehindCursor', elementBehindCursor)
-      // var dropTarget = findDropTarget(elementBehindCursor, clientX, clientY) // drop目标
-      // console.log('isContainer(dropTarget)', isContainer(dropTarget))
-      // if (isContainer(dropTarget)) {
-      //   console.log('test', dropTarget)
-      //   dropTarget = getChildren(dropTarget)[0]
-      //   console.log('test1', dropTarget)
-      //   while (!isList(dropTarget)) {
-      //     debugger
-      //     dropTarget = getChildren(dropTarget)[0]
-      //   }
-      //   var changed = dropTarget !== null && dropTarget !== _lastDropTarget
-      //   if (changed || dropTarget === null) {
-      //     out()
-      //     _lastDropTarget = dropTarget
-      //     over()
-      //   }
-      //   var reference = null
-      //   if (
-      //     (reference === null && changed) ||
-      //     reference !== item &&
-      //     reference !== nextEl(item) // 拿到元素的下个元素节点
-      //   ) {
-      //     console.log('(reference === null && changed) ||reference !== item &&reference !== nextEl(item)')
-      //     console.log(reference)
-      //     _currentSibling = reference
+      // var item = this.copy || this.item
+      /* eslint-disable */
+      var elementBehindCursor = this.getElementBehindPoint(this.mirror, clientX, clientY) // 鼠标下的元素
+      var dropTarget = this.findDropTarget(elementBehindCursor, clientX, clientY, this.getImmediateChild) // drop目标
+      debugger
+      if (window.o.isContainer(dropTarget)) {
+        dropTarget = this.getChildren(dropTarget)[0]
+        while (!window.o.isList(dropTarget)) {
+          dropTarget = this.getChildren(dropTarget)[0]
+        }
+        // var changed = dropTarget !== null && dropTarget !== _lastDropTarget
+        // if (changed || dropTarget === null) {
+        //   out()
+        //   _lastDropTarget = dropTarget
+        //   over()
+        // }
+        // var reference = null
+        // if (
+        //   (reference === null && changed) ||
+        //   reference !== item &&
+        //   reference !== nextEl(item) // 拿到元素的下个元素节点
+        // ) {
+        //   console.log('(reference === null && changed) ||reference !== item &&reference !== nextEl(item)')
+        //   console.log(reference)
+        //   _currentSibling = reference
 
-      //     console.log('dropTarget.insertBefore(item, reference)', reference)
-      //     dropTarget.insertBefore(item, reference)
-      //     drake.emit('shadow', item, dropTarget, _source)
-      //   }
-      //   return
-      // }
+        //   console.log('dropTarget.insertBefore(item, reference)', reference)
+        //   dropTarget.insertBefore(item, reference)
+        //   drake.emit('shadow', item, dropTarget, _source)
+        // }
+        // return
+      }
       // var changed = dropTarget !== null && dropTarget !== _lastDropTarget
       // console.log('_lastDropTarget', _lastDropTarget)
       // console.log('dropTarget', dropTarget)

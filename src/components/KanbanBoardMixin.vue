@@ -9,7 +9,13 @@ export default {
       default () {
         return {
           copy: false,
-          mirrorContainer: document.body
+          mirrorContainer: document.body,
+          isContainer (el) {
+            return false
+          },
+          isList (el) {
+            return el.classList.contains('drag-inner-list')
+          }
         }
       }
     }
@@ -31,6 +37,9 @@ export default {
       documentElement: document.documentElement,
       mirror: false
     }
+  },
+  created () {
+    window.o = this.o
   },
   methods: {
     getParent (el) { return el.parentNode === document ? null : el.parentNode },
@@ -121,10 +130,57 @@ export default {
       }
     },
     isCopy (item, container) {
-      return typeof this.o.copy === 'boolean' ? this.o.copy : this.o.copy(item, container)
+      return typeof window.o.copy === 'boolean' ? window.o.copy : window.o.copy(item, container)
     },
     getRectWidth (rect) { return rect.width || (rect.right - rect.left) },
-    getRectHeight (rect) { return rect.height || (rect.bottom - rect.top) }
+    getRectHeight (rect) { return rect.height || (rect.bottom - rect.top) },
+    getElementBehindPoint (point, x, y) {
+      var p = point || {}
+      var state = p.className
+      var el
+      p.className += ' gu-hide'
+      el = document.elementFromPoint(x, y) // 返回当前文档上处于指定坐标位置最顶层的元素, 坐标是相对于包含该文档的浏览器窗口的左上
+      p.className = state
+      return el
+    },
+    findDropTarget (elementBehindCursor, clientX, clientY, getImmediateChild) { // 鼠标下的元素(var elementBehindCursor = getElementBehindPoint(_mirror, clientX, clientY))  clientX, clientY
+      var target = elementBehindCursor
+      while (target && !accepted()) {
+        target = this.getParent(target)
+      }
+      return target
+
+      function accepted () {
+        var droppable = window.o.isList(target) || window.o.isContainer(target) // 可以放入
+        if (droppable === false) {
+          return false
+        }
+
+        var immediate = getImmediateChild(target, elementBehindCursor)
+        console.log(immediate)
+        // var reference = getReference(target, immediate, clientX, clientY)
+        // var initial = isInitialPlacement(target, reference)
+        // console.log('var initial = isInitialPlacement(target, reference)', initial)
+        // if (initial) {
+        //   return true // should always be able to drop it right back where it was
+        // }
+        // return o.accepts(this.item, target, this.source, reference)
+      }
+    },
+    getImmediateChild (dropTarget, target) { // 拿到dropTarget下级元素
+      var immediate = target
+      while (immediate !== dropTarget && this.getParent(immediate) !== dropTarget) {
+        immediate = this.getParent(immediate)
+      }
+      if (immediate === this.documentElement) {
+        return null
+      }
+      return immediate
+    },
+    getChildren (el) {
+      console.log(Array.isArray(el.children) === true)
+      return el.children
+    }
   }
 }
 </script>
